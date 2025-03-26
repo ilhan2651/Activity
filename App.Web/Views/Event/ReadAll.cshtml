@@ -1,0 +1,45 @@
+﻿@using App.Dto.EventDtos
+@model EventListDto
+@{
+    ViewData["Title"] = "ReadAll";
+    Layout = "~/Views/Shared/UserLayout.cshtml";
+}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+
+            <!-- Blog Details Section -->
+            <section id="blog-details" class="blog-details section">
+                <div class="container">
+                    <article class="article">
+                        <div class="post-img">
+                            <img src="@Model.EventImageUrl" alt="" class="img-fluid rounded">
+                        </div>
+
+                        <h2 class="title">@Model.EventTitle</h2>
+
+                        <div class="meta-top">
+                            <ul>
+                                <li class="d-flex align-items-center"><i class="bi bi-person"></i> <a href="#">@Model.CreatedBy</a></li>
+                                <li class="d-flex align-items-center"><i class="bi bi-clock"></i> <a href="#"><time datetime="@Model.Date.ToString("yyyy-MM-dd")">@Model.Date.ToString("dd MMMM yyyy")</time></a></li>
+                                <li class="d-flex align-items-center"><i class="bi bi-chat-dots"></i> <a href="#"><span id="commentCount">@Model.CommentsCount</span> Yorum</a></li>
+                            </ul>
+                        </div><!-- End meta top -->
+
+                        <div class="content">
+                            <p>
+                                @Model.EventContent
+                            </p>
+                        </div><!-- End post content -->
+                    </article>
+                </div>
+            </section>
+
+            <section id="comments">
+                @await Component.InvokeAsync("Comments", new { eventId = Model.EventId })
+            </section>
+
+        </div>
+    </div>
+</div>
+

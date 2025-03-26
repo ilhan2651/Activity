@@ -1,0 +1,50 @@
+﻿@using App.Dto.EventParticipantDtos
+@model List<ParticipantListDto>
+<style>
+    .participant-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .participant-card {
+        background: white;
+        border-radius: 10px;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+        .participant-card:hover {
+            background: #f8f9fa;
+            transform: scale(1.03);
+        }
+
+        .participant-card img {
+            border: 3px solid #ddd;
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+</style>
+
+
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div class="alert alert-warning">@ViewBag.ErrorMessage</div>
+}
+else
+{
+    <h4 class="mt-4 text-uppercase text-muted">Katılımcılar</h4>
+    <div class="participant-list">
+        @foreach (var participant in Model)
+        {
+            <div class="participant-card d-flex align-items-center p-2 mb-2 shadow-sm rounded bg-light">
+                <img src="@participant.UserPictureUrl" class="rounded-circle border me-3" width="50" height="50" alt="@participant.UserName">
+                <span class="fw-bold text-dark">@participant.UserName</span>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,57 @@
+﻿@using App.Dto.EventDtos
+@model List<EventListDto>
+
+@{
+    ViewData["Title"] = "Geçmiş Etkinlikler";
+    Layout = "~/Views/Shared/UserLayout.cshtml";
+}
+
+<section id="blog-posts" class="blog-posts section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="section-title">Geçmiş Etkinlikler</h2>
+            </div>
+        </div>
+
+        <div class="row gy-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <article class="position-relative h-100">
+                        <div class="post-img position-relative overflow-hidden">
+                            <img src="@item.EventImageUrl" class="img-fluid" alt="@item.EventTitle">
+                            <span class="post-date">@item.Date.ToString("dd MMMM yyyy")</span>
+                        </div>
+
+                        <div class="post-content d-flex flex-column">
+                            <h3 class="post-title">@item.EventTitle</h3>
+
+                            <div class="meta d-flex align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-person"></i> <span class="ps-2">@item.CreatedBy</span>
+                                </div>
+                            </div>
+
+                            
+                            @{
+                                var truncatedText = item.EventContent.Length > 115
+                                ? item.EventContent.Substring(0, item.EventContent.Substring(0, 115).LastIndexOf(" ")) + "..."
+                                : item.EventContent;
+                            }
+                            <p>@truncatedText</p>
+
+                            <hr>
+
+                            <a href="/Event/ReadAll/@item.EventId/" class="readmore stretched-link">
+                                <span>Devamını Oku</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
