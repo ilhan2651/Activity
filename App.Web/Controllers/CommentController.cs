@@ -1,11 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using App.Dto.CommentDto;
+﻿using App.Dto.CommentDto;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 
 namespace App.Web.Controllers
 {
@@ -20,57 +16,36 @@ namespace App.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddComment(CreateCommentDto commentDto)
+        public async Task<IActionResult> AddComment(CreateCommentDtoMvc dto)
         {
-            if (string.IsNullOrEmpty(commentDto.Content))
-            {
-                TempData["Error"] = "Yorum boş olamaz.";
-                return RedirectToAction("ReadAll", "Event", new { id = commentDto.EventId });
-            }
-
-            // ✅ Kullanıcı kimliğini JWT içinden al
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
-            {
-                TempData["Error"] = "Kimlik doğrulama başarısız.";
-                return RedirectToAction("ReadAll", "Event", new { id = commentDto.EventId });
-            }
-
-            if (!int.TryParse(userIdClaim, out int userId))
-            {
-                TempData["Error"] = "Geçersiz kullanıcı kimliği.";
-                return RedirectToAction("ReadAll", "Event", new { id = commentDto.EventId });
-            }
-
-            // ✅ JWT Token'ı Cookie'den al (Eğer Cookie'de saklanıyorsa)
-            var token = HttpContext.Request.Cookies["jwt"];
-
-            // ✅ API'ye `POST` isteği yap
-            var requestBody = new CreateCommentDto
-            {
-                EventId = commentDto.EventId,
-                Content = commentDto.Content,
-                UserId = userId
-            };
-
-            var json = JsonConvert.SerializeObject(requestBody);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
+            var token = Request.Cookies["jwt"];
             if (!string.IsNullOrEmpty(token))
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
 
-            var response = await _httpClient.PostAsync("https://localhost:5001/api/CommentApi/AddComment", content);
+            var form = new MultipartFormDataContent();
+            form.Add(new StringContent(dto.EventId.ToString()), "EventId");
+            form.Add(new StringContent(dto.Content), "Content");
+
+            // Dosya varsa, yükleme işlemi
+            if (dto.CommentImage != null)
+            {
+                var stream = dto.CommentImage.OpenReadStream();
+                form.Add(new StreamContent(stream), "CommentImage", dto.CommentImage.FileName);
+            }
+
+            var response = await _httpClient.PostAsync("https://localhost:44344/api/Comment/AddComment", form);
 
             if (!response.IsSuccessStatusCode)
             {
-                TempData["Error"] = "Yorum eklenirken hata oluştu.";
-                return RedirectToAction("ReadAll", "Event", new { id = commentDto.EventId });
+                TempData["Error"] = "Yorum gönderilemedi.";
+                return RedirectToAction("ReadAll", "Event", new { id = dto.EventId }); // Hata durumunda geri dönüyoruz
             }
 
-            TempData["Success"] = "Yorum başarıyla eklendi!";
-            return RedirectToAction("ReadAll", "Event", new { id = commentDto.EventId });
+            TempData["Success"] = "Yorum başarıyla eklendi.";
+            return RedirectToAction("ReadAll", "Event", new { id = dto.EventId });
         }
+
     }
 }

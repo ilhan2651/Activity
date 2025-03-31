@@ -1,57 +1,20 @@
 ﻿@using App.Dto.CommentDto
 @model List<ListCommentDto>
-<section id="blog-comments" class="blog-comments section">
-    <div class="container">
-        <h3 class="mb-4">Yorumlar (<span id="commentCountDynamic">@ViewBag.CommentCount</span>)</h3>
+<h3>Yorumlar (@ViewBag.CommentCount)</h3>
+@foreach (var item in Model)
+{
+    <div class="comment d-flex align-items-start mb-3">
+        <img src="@item.UserImage" class="rounded-circle me-3" style="width:60px; height:60px; object-fit:cover;" />
+        <div>
+            <h5>@item.UserName</h5>
+            <p>@item.Content</p>
 
-        @foreach (var item in Model)
-        {
-            <div id="comment-@item.Id" class="comment">
-                <div class="d-flex">
-                    <div class="comment-img"><img src="@item.UserImage" alt=""></div>
-                    <div>
-                        <h5><a href="">@item.UserName</a></h5>
-                        <time datetime="@item.CreatedAt.ToString("yyyy-MM-dd")">
-                            @(item.CreatedAt.ToString("dd MMMM yyyy") ?? "Tarih Yok")
-                        </time>
-                        <p>@item.Content</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- End comment -->
-        }
+            @if (!string.IsNullOrEmpty(item.EventImage))
+            {
+                <img src="@item.EventImage" class="img-fluid" style="max-width: 300px;" />
+            }
+            <small class="text-muted">@item.CreatedAt.ToString("dd MMMM yyyy HH:mm")</small>
+        </div>
     </div>
-</section>
 
-
-
-<section id="comment-form" class="comment-form section">
-    <div class="container">
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success">@TempData["Success"]</div>
-        }
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger">@TempData["Error"]</div>
-        }
-
-        <form method="post" asp-controller="Comment" asp-action="AddComment">
-            <h4>Yorum Yap</h4>
-
-            <input type="hidden" name="EventId" value="@ViewBag.EventId" />
-
-            <div class="row">
-                <div class="col form-group">
-                    <textarea name="Content" class="form-control" placeholder="Yorumunuz*" required></textarea>
-                </div>
-            </div>
-
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">Yorumu Gönder</button>
-            </div>
-        </form>
-    </div>
-</section>
-
+}

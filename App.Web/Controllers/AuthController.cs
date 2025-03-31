@@ -1,6 +1,9 @@
 ﻿using App.Dto.UserDtos;
 using App.Services.Services.ApiServices.Concrete;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace App.Web.Controllers
 {
@@ -13,54 +16,60 @@ namespace App.Web.Controllers
             _authApiService = authApiService;
         }
 
-        public IActionResult Login()
-        {
-            return View();
-        }
+        [HttpGet]
+        public IActionResult Login() => View();
+
         [HttpPost]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
             if (!ModelState.IsValid)
                 return View(loginDto);
-            var isLoggedIn=await _authApiService.LoginAsync(loginDto);
-            if (!isLoggedIn)
+
+            var (success, token, id, username, email) = await _authApiService.LoginWithResultAsync(loginDto);
+
+            if (!success)
             {
                 ModelState.AddModelError("", "Geçersiz e-posta veya şifre.");
                 return View(loginDto);
             }
+
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, id),
+        new Claim(ClaimTypes.Name, username),
+        new Claim(ClaimTypes.Email, email)
+    };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
             return RedirectToAction("Index", "MainPage");
-
         }
+
+
         [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-        [HttpPost]
-        public async Task<IActionResult> Register( RegisterDto registerDto)
-        {
-            if (!ModelState.IsValid)
-                return View(registerDto);
-            var isRegistered = await _authApiService.RegisterAsync(registerDto);
+        public IActionResult Register() => View();
 
-            if (isRegistered)
-            {
-               return RedirectToAction("Login");
-            }
-            ModelState.AddModelError("", "Kayıt başarısız. Lütfen tekrar deneyin.");
-            return View(registerDto);
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterDto dto)
+        {
+            if (!ModelState.IsValid) return View(dto);
+
+            var isSuccess = await _authApiService.RegisterAsync(dto);
+            if (isSuccess) return RedirectToAction("Login");
+
+            ModelState.AddModelError("", "Kayıt başarısız. Tekrar deneyin.");
+            return View(dto);
         }
+
         public async Task<IActionResult> Logout()
         {
-            var isLoggedOut = await _authApiService.LogoutAsync();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _authApiService.LogoutAsync(); 
 
-            if (isLoggedOut)
-            {
-                return RedirectToAction("Login");
-            }
-
-            ModelState.AddModelError("", "Çıkış işlemi başarısız oldu.");
-            return View();
+            return RedirectToAction("Login");
         }
 
     }

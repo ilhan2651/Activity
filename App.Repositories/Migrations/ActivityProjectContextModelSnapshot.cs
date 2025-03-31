@@ -147,6 +147,9 @@ namespace App.Repositories.Migrations
                     b.Property<int>("EventId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("EventImage")
+                        .HasColumnType("text");
+
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 

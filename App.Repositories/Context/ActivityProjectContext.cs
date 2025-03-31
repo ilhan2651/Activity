@@ -14,13 +14,12 @@ namespace App.Repositories.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured) // Eğer yapılandırılmamışsa
+            if (!optionsBuilder.IsConfigured)
             {
-                // Doğru dizine gitmek için path'i belirle
-                var basePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "../App.Api"));
+                var basePath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "App.Api"));
 
                 var configuration = new ConfigurationBuilder()
-                    .SetBasePath(basePath) // `App.Api` dizinini baz al
+                    .SetBasePath(basePath)
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
                     .Build();
@@ -30,7 +29,6 @@ namespace App.Repositories.Context
                 optionsBuilder.UseNpgsql(connectionString);
             }
         }
-
 
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Event> Events { get; set; }

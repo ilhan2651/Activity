@@ -1,0 +1,91 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Moderatör Paneli</title>
+
+    <!-- Stil Dosyaları -->
+    <link href="~/Company-1.0.0/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Company-1.0.0/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet" />
+    <link href="~/Company-1.0.0/assets/css/main.css" rel="stylesheet" />
+
+    <style>
+        /* Özel yeşil tonları */
+        :root {
+            --mod-green: #2f855a; /* Zümrüt yeşili */
+            --mod-green-light: #38a169; /* Açık zümrüt */
+            --mod-green-dark: #22543d;
+        }
+
+        .navbar-mod {
+            background-color: var(--mod-green) !important;
+        }
+
+        .header-mod {
+            background-color: var(--mod-green-dark);
+        }
+
+        .footer-mod {
+            background-color: var(--mod-green);
+        }
+
+            .navbar-mod .nav-link,
+            .footer-mod small {
+                color: #e6fffa !important;
+            }
+
+                .navbar-mod .nav-link:hover {
+                    color: #c6f6d5 !important;
+                }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Header -->
+    <header class="header-mod text-white p-3 text-center">
+        <h2 class="m-0">🌿 Moderatör Paneli</h2>
+    </header>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-mod">
+        <div class="container">
+            <a class="navbar-brand text-white" href="#">Mod Panel</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#modNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="modNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" href="/Moderator/Event">Etkinlikler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Moderator/Comment">Yorumlar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Moderator/Team">Takım</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Moderator/Role">Roller</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/">Siteye Git</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- İçerik -->
+    <main class="flex-grow-1 container mt-4">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-mod text-white text-center p-3 mt-auto">
+        <small>&copy; @DateTime.Now.Year Ata Apartmanı | Tüm Hakları Saklıdır.</small>
+    </footer>
+
+    <!-- Scriptler -->
+    <script src="~/Company-1.0.0/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Company-1.0.0/assets/js/main.js"></script>
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

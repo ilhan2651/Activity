@@ -19,9 +19,17 @@ namespace App.Web.Controllers
         }
         public async Task<IActionResult> ReadAll(int id)
         {
-           var evnt=await _eventApiService.GetEventById(id);
+            var evnt = await _eventApiService.GetEventById(id);
+            if (evnt == null)
+            {
+                TempData["Error"] = "Etkinlik bulunamadı.";
+                return RedirectToAction("Index", "Event");
+            }
+
             return View(evnt);
-       
         }
+
+
+
     }
 }

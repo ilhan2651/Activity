@@ -15,4 +15,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Moderator\Data\" />
+    <Folder Include="Areas\Moderator\Models\" />
+    <Folder Include="wwwroot\uploads\comments\" />
+  </ItemGroup>
+
 </Project>

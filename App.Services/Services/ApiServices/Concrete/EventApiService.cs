@@ -1,4 +1,5 @@
 ﻿using App.Dto.EventDtos;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Net.Http;
 using System.Text.Json;
@@ -9,10 +10,12 @@ namespace App.Services.Services.ApiServices.Concrete
     public class EventApiService
     {
         private readonly HttpClient _httpClient;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public EventApiService(HttpClient httpClient)
+        public EventApiService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = httpClient;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<EventDto?> GetWeeklyActivitiesAsync()

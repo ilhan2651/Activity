@@ -1,4 +1,5 @@
-﻿using App.Entities;
+﻿using App.Dto.ContactDto;
+using App.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,9 @@ namespace App.Services.Services.Abstract
 {
     public interface IContactService
     {
-        Task AddContact(Contact contact);
+        Task AddContact(CreateContactDto  dto);
         Task RemoveContact(int id);
-        Task<IEnumerable<Contact>> GetAllContactsByDateAsync();
+        Task<List<ListContactDto>> GetAllContactsByDateAsync();
 
     }
 }

@@ -12,6 +12,7 @@ using FluentValidation.AspNetCore;
 using System.Text;
 using App.Services.Validation;
 using FluentValidation;
+using App.Services.Services.Abstract;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,16 +30,16 @@ builder.WebHost.UseUrls("https://localhost:44344", "http://0.0.0.0:44344");
 builder.Services.AddIdentity<AppUser, AppRole>(options =>
 {
 
-    options.Password.RequireUppercase = false; 
-    options.Password.RequireNonAlphanumeric = false; 
-    options.Password.RequiredLength = 6; 
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 6;
 
-  
-    options.User.RequireUniqueEmail = true; 
+
+    options.User.RequireUniqueEmail = true;
 
 })
-.AddEntityFrameworkStores<ActivityProjectContext>() 
-.AddDefaultTokenProviders() 
+.AddEntityFrameworkStores<ActivityProjectContext>()
+.AddDefaultTokenProviders()
 .AddErrorDescriber<TurkishIdentityErrorDescriber>();
 
 //------------------JWT-----------------------
@@ -103,7 +104,8 @@ builder.Services.AddControllers();
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation()
                 .AddFluentValidationClientsideAdapters();
-builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>(); 
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateContactValidator>();
 
 
 
@@ -133,6 +135,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // wwwroot klasörü için gerekli
+
 app.UseCors(corsPolicy);
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

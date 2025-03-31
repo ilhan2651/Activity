@@ -1,4 +1,6 @@
-﻿using App.Entities;
+﻿using App.Dto.CommentDto;
+using App.Dto.ContactDto;
+using App.Entities;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
@@ -8,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace App.Services.Validation
 {
-    public class ContactValidation : AbstractValidator<Contact>
+    public class CreateContactValidator : AbstractValidator<CreateContactDto>
     {
-        public ContactValidation()
+        public CreateContactValidator()
         {
             RuleFor(c => c.Name).NotEmpty().WithMessage("İsim Boş Olamaz.")
            .MinimumLength(3).WithMessage("İsim En Az 3 Karakter Olmalıdır.")

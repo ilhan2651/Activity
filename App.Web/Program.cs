@@ -1,4 +1,7 @@
 using App.Services.Services.ApiServices.Concrete;
+using App.Services.Validation;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,20 @@ builder.Services.AddHttpClient("ApiClient", client =>
     client.BaseAddress = new Uri("https://localhost:44344/");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
+builder.Services.AddFluentValidationAutoValidation()
+                .AddFluentValidationClientsideAdapters();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateContactValidator>();
+builder.Services.AddValidatorsFromAssembly(typeof(CreateContactValidator).Assembly);
+
+builder.Services.AddAuthentication("Cookies")
+    .AddCookie("Cookies", options =>
+    {
+        options.LoginPath = "/Auth/Login";
+        options.AccessDeniedPath = "/Auth/AccessDenied";
+        options.Cookie.Name = "MyApp.Auth";
+        options.Cookie.HttpOnly = true;
+    });
 
 // Servisleri DI container'a ekle, ortak HttpClient kullan
 builder.Services.AddScoped<EventApiService>(provider =>
@@ -40,6 +57,13 @@ builder.Services.AddScoped<AuthApiService>(provider =>
 
     return new AuthApiService(httpClientFactory.CreateClient("ApiClient"), httpContextAccessor);
 });
+builder.Services.AddScoped<ContactApiService>(provider =>
+{
+    var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+    var httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
+
+    return new ContactApiService(httpClientFactory.CreateClient("ApiClient"), httpContextAccessor);
+});
 
 
 var app = builder.Build();
@@ -55,12 +79,18 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseRouting();
 
+app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+

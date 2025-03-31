@@ -1,9 +1,11 @@
 ﻿using App.Dto.UserDtos;
+using App.Entities;
 using App.Services.Services.Abstract;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
@@ -15,16 +17,24 @@ namespace App.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService,UserManager<AppUser> userManager)
         {
             _authService = authService;
+            _userManager= userManager;  
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
             var token = await _authService.LoginUser(model);
-            if (token == null) return Unauthorized(new {message="Geçersiz Giriş Bilgileri"});
+            if (token == null)
+                return Unauthorized(new { message = "Geçersiz Giriş Bilgileri" });
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return Unauthorized(new { message = "Kullanıcı bulunamadı" });
+
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
@@ -32,9 +42,22 @@ namespace App.Api.Controllers
                 SameSite = SameSiteMode.Strict,
                 Expires = DateTime.UtcNow.AddHours(1)
             };
-            Response.Cookies.Append("JWTToken",token,cookieOptions);
-            return Ok(new {token});
+
+            Response.Cookies.Append("jwt", token, cookieOptions); 
+
+            return Ok(new
+            {
+                token,
+                user = new
+                {
+                    id = user.Id,
+                    email = user.Email,
+                    username = user.UserName
+                }
+            });
         }
+
+
         [Authorize]
         [HttpPost("logout")]
         public IActionResult Logout()
@@ -76,3 +99,6 @@ namespace App.Api.Controllers
      
     }
 }
+// git add .
+//git commit -m "Açıklayıcı bir mesaj"
+//git push origin main

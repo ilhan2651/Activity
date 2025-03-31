@@ -1,0 +1,60 @@
+﻿@model App.Dto.CommentDto.CreateCommentDto
+
+<section class="comment-form-section mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h4 class="mb-4"><i class="bi bi-chat-dots-fill me-2"></i>Yorum Yap</h4>
+
+            <form method="post" asp-controller="Comment" asp-action="AddComment" enctype="multipart/form-data">
+                <input type="hidden" name="EventId" value="@Model.EventId" />
+
+                <div class="form-group mb-3">
+                    <label for="Content" class="form-label">Yorumunuz</label>
+                    <textarea name="Content" id="Content" class="form-control" rows="4" placeholder="Etkinlik hakkındaki düşüncenizi yazın..." required></textarea>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="CommentImage" class="form-label">Fotoğraf (isteğe bağlı)</label>
+                    <input type="file" name="CommentImage" id="CommentImage" class="form-control" accept="image/*" />
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-send-fill me-1"></i> Gönder
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        @if (TempData["Success"] != null)
+        {
+            <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı!',
+                        text: '@TempData["Success"]',
+                        confirmButtonColor: '#198754'
+                    });
+            </text>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata!',
+                        text: '@TempData["Error"]',
+                        confirmButtonColor: '#dc3545'
+                    });
+            </text>
+        }
+                        });
+    </script>
+}

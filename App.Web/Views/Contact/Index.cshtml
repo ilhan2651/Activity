@@ -1,0 +1,119 @@
+﻿@model App.Dto.ContactDto.CreateContactDto
+@{
+    ViewData["Title"] = "İletişim";
+    Layout = "~/Views/Shared/UserLayout.cshtml";
+}
+
+<section id="contact" class="contact section">
+    <br>
+    <h1 class="text-center fw-bold">İletişim</h1>
+    <br>
+
+    <!-- Google Maps -->
+    <div class="mb-5">
+        <iframe style="width: 100%; height: 400px;"
+                src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d766.474858473668!2d30.509601899578477!3d39.7868122!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1str!2sro!4v1743082200479!5m2!1str!2sro"
+                frameborder="0" allowfullscreen="">
+        </iframe>
+    </div>
+
+    <div class="container" data-aos="fade">
+        <div class="row gy-5 gx-lg-5">
+
+            <!-- İletişim Bilgileri -->
+            <div class="col-lg-4">
+                <div class="info">
+                    <h3>Bizimle İletişime Geçin</h3>
+                    <p>Her türlü görüş, öneri ve şikayetiniz için bizimle iletişime geçebilirsiniz.</p>
+
+                    <div class="info-item d-flex">
+                        <i class="bi bi-geo-alt flex-shrink-0"></i>
+                        <div>
+                            <h4>Adres:</h4>
+                            <p>Ata Apartmanı Bolayır Sokak No:2/13 Tepebaşı/Eskişehir</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item d-flex">
+                        <i class="bi bi-envelope flex-shrink-0"></i>
+                        <div>
+                            <h4>Email:</h4>
+                            <p>ilhanrandakk@gmail.com</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item d-flex">
+                        <i class="bi bi-phone flex-shrink-0"></i>
+                        <div>
+                            <h4>Telefon:</h4>
+                            <p>+90 535 586 53 15</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Alanı -->
+            <div class="col-lg-8">
+                <form asp-action="Index" asp-controller="Contact" method="post" novalidate>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <input asp-for="Name" class="form-control" placeholder="Adınız" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-group mt-3 mt-md-0">
+                            <input asp-for="Email" class="form-control" placeholder="E-posta" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <input asp-for="Subject" class="form-control" placeholder="Konu" />
+                        <span asp-validation-for="Subject" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mt-3">
+                        <textarea asp-for="Message" class="form-control" rows="5" placeholder="Mesajınız"></textarea>
+                        <span asp-validation-for="Message" class="text-danger"></span>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary">Mesaj Gönder</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: '@Html.Raw(TempData["SuccessMessage"])',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Tamam'
+                });
+            </text>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: '@Html.Raw(TempData["ErrorMessage"])',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'Kapat'
+                });
+            </text>
+        }
+    </script>
+}
+

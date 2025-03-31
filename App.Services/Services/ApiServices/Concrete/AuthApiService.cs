@@ -57,6 +57,38 @@ namespace App.Services.Services.ApiServices.Concrete
 
             return true;
         }
+        public async Task<(bool success, string token, string id, string username, string email)> LoginWithResultAsync(LoginDto dto)
+        {
+            var json = JsonSerializer.Serialize(dto);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync("api/Auth/login", content);
+
+            if (!response.IsSuccessStatusCode)
+                return (false, "", "", "", "");
+
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var jsonObj = JsonDocument.Parse(responseBody).RootElement;
+
+            var token = jsonObj.GetProperty("token").GetString();
+            var user = jsonObj.GetProperty("user");
+
+            // 🔧 int tipinde gelen ID'yi int olarak alıp string'e çeviriyoruz
+            var id = user.GetProperty("id").GetInt32().ToString();
+            var username = user.GetProperty("username").GetString();
+            var email = user.GetProperty("email").GetString();
+
+            _contextAccessor.HttpContext?.Response.Cookies.Append("jwt", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                Expires = DateTime.UtcNow.AddHours(1)
+            });
+
+            return (true, token, id, username, email);
+        }
+
+
+
 
     }
 }

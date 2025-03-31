@@ -1,7 +1,10 @@
 ﻿using App.Dto.CommentDto;
 using App.Entities;
 using App.Services.Services.Abstract;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
 using System.Security.Claims;
 
 namespace App.Api.Controllers
@@ -11,61 +14,61 @@ namespace App.Api.Controllers
     public class CommentController : ControllerBase
     {
         private readonly ICommentService _commentService;
+        private readonly IWebHostEnvironment _env;
+        private readonly UserManager<AppUser> _userManager;
 
-        public CommentController(ICommentService commentService)
+        public CommentController(ICommentService commentService, IWebHostEnvironment env, UserManager<AppUser> userManager)
         {
             _commentService = commentService;
-        }
-        [HttpGet("listByEventId/{eventId}")]
-        public async Task<IActionResult> GetCommentListByEventId(int eventId)
-        {
-            var commentList= await _commentService.GetCommentsByEventId(eventId);
-            if (commentList == null || !commentList.Any())  
-            {
-                return NotFound("Bu etkinliğe hiç yorum yapılmamış. İlk yorumu yapmaya ne dersin.");
-            }
-            return Ok(commentList);
+            _env = env;
+            _userManager = userManager;
         }
         [HttpPost("AddComment")]
-        public async Task<IActionResult> CreateComment([ FromBody] CreateCommentDto createDto)
+        public async Task<IActionResult> AddComment([FromForm] CreateCommentDto dto)
         {
-            if (string.IsNullOrEmpty(createDto.Content))
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(userIdClaim);
+            if (user == null) return NotFound("Kullanıcı bulunamadı.");
+
+            string? imagePath = null;
+
+            if (dto.CommentImage != null && dto.CommentImage.Length > 0)
             {
-                return BadRequest(new { success = false, message = "Yorum boş olamaz." });
+                var fileName = Guid.NewGuid() + Path.GetExtension(dto.CommentImage.FileName);
+
+                var folder = Path.Combine(Directory.GetCurrentDirectory(), "App.Web", "wwwroot", "uploads", "comments");
+
+                Directory.CreateDirectory(folder); // Klasör yoksa oluşturulur
+
+                var filePath = Path.Combine(folder, fileName);
+
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await dto.CommentImage.CopyToAsync(stream);
+
+                imagePath = "/uploads/comments/" + fileName;
             }
 
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
+            var comment = new Comment
             {
-                return Unauthorized(new { success = false, message = "Kimlik doğrulama başarısız." });
-            }
-
-            if (!int.TryParse(userIdClaim, out int userId))
-            {
-                return Unauthorized(new { success = false, message = "Geçersiz kullanıcı kimliği." });
-            }
-
-            var newComment = new Comment
-            {
-                EventId = createDto.EventId,
-                Content = createDto.Content,
-                UserId = userId,
-                CreatedAt = DateTime.UtcNow
+                EventId = dto.EventId,
+                Content = dto.Content,
+                UserId = user.Id,
+                CreatedAt = DateTime.UtcNow,
+                EventImage = imagePath
             };
 
-            await _commentService.AddComment(newComment);
-            return Ok(new { success = true, message = "Yorum başarıyla eklendi!" });
+            await _commentService.AddComment(comment);
+            return Ok(new { message = "Yorum başarıyla eklendi." });
         }
-    
-        [HttpDelete]
-        public async Task<IActionResult> DeleteComment(int commentId)
+        [HttpGet("ListByEventId/{eventId}")]
+        public async Task<IActionResult> GetByEvent(int eventId)
         {
-            var deletedComment=await _commentService.DeleteEventAsync(commentId);
-            if (!deletedComment)
-            {
-                NotFound(new { message = "Silmek istediğiniz yorum bulunamadı." });
-            }
-            return Ok(new {message="Yorum başarıyla silindi."});
+            var comments = await _commentService.GetCommentsByEventId(eventId);
+            return Ok(comments);
         }
+
+
     }
 }

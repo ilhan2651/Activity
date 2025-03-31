@@ -37,6 +37,7 @@
 
             <section id="comments">
                 @await Component.InvokeAsync("Comments", new { eventId = Model.EventId })
+                @await Component.InvokeAsync("CreateComment", new { eventId = Model.EventId })
             </section>
 
         </div>

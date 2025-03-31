@@ -55,9 +55,7 @@
     <div class="container">
 
         <div class="row position-relative">
-
             <div class="col-lg-7 about-img" data-aos="zoom-out" data-aos-delay="200"><img src="@Model.EventImageUrl"></div>
-
             <div class="col-lg-7" data-aos="fade-up" data-aos-delay="100">
                 <h2 class="inner-title">Haftanın Etkinliği</h2>
                 <div class="our-story">
@@ -68,16 +66,13 @@
                         <li><i class="bi bi-check-circle"></i> <span>@Model.Date.ToString("dd.MM.yyyy")</span></li>
                         <li><i class="bi bi-check-circle"></i> <span>@Model.Date.ToString("HH:mm")</span></li>
                         <li><i class="bi bi-person"></i> <span>@Model.CreatedBy tarafından oluşturuldu.</span></li>
-                        
                     </ul>
                     <a href="#" class="btn btn-success mt-3">Etkinliğe Katıl</a>
                     <br>
                     @await Component.InvokeAsync("Participants", new { eventId = Model.EventId })
                 </div>
             </div>
-
         </div>
-
     </div>
 
 </section>
@@ -90,34 +85,5 @@
         <p>Etkinliklerdeki fotoğraflarımızı buradan bulabilirsiniz.</p>
     </div><!-- End Section Title -->
 
-    <div class="container">
-
-        <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
-
-            <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="100">
-                <li data-filter="*" class="filter-active">Hepsi</li>
-                <li data-filter=".filter-app">Toplu</li>
-                <li data-filter=".filter-product">Kısmi</li>
-                <li data-filter=".filter-branding">Kişisel</li>
-            </ul><!-- End Portfolio Filters -->
-
-            <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
-
-                <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
-                    <img src="assets/img/masonry-portfolio/masonry-portfolio-1.jpg" class="img-fluid" alt="">
-                    <div class="portfolio-info">
-                        <h4>Etkinlik ismi.</h4>
-                        <p>Etkinlik tarihi.</p>
-                        <a href="assets/img/masonry-portfolio/masonry-portfolio-1.jpg" title="App 1" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-                        <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
-                    </div>
-                </div><!-- End Portfolio Item -->
-
-
-            </div><!-- End Portfolio Container -->
-
-        </div>
-
-    </div>
 
 </section>

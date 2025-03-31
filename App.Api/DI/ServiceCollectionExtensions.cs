@@ -28,6 +28,7 @@ namespace App.Api.DI
             services.AddScoped<IContactService, ContactService>();
             services.AddScoped<IContactRepository, ContactRepository>();
 
+            services.AddScoped<IMailService, MailService>();
 
 
 
