@@ -4,6 +4,7 @@ using App.Services.Services.Abstract;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
+using System.Security.Claims;
 
 namespace App.Api.Controllers
 {
@@ -29,12 +30,24 @@ namespace App.Api.Controllers
             if (evnt == null) return NotFound(new { message = "Etkinlik bulunamadı." });
             return Ok(evnt);
         }
-        [HttpPost]
+        [HttpPost("createEvent")]
         public async Task<IActionResult> CreateEvent([FromBody] CreateEventDto eventDto)
         {
-            var newEvent = await _eventService.CreateEventAsync(eventDto);
-            return Ok(new {message="Etkinlik başarılı bir şekilde eklendi."});
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Kullanıcı kimliği bulunamadı." });
+            }
+
+            int userId = int.Parse(userIdClaim);
+            var result = await _eventService.CreateEventAsync(eventDto, userId);
+
+            if (!result)
+                return BadRequest(new { message = "Etkinlik oluşturulamadı." });
+
+            return Ok(new { message = "Etkinlik başarıyla oluşturuldu." });
         }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEvent(int id,  [FromBody] UpdateEventDto eventDto)
         {
@@ -49,7 +62,7 @@ namespace App.Api.Controllers
             }
             return Ok(updatedEvent);
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
            var isDeleted= await _eventService.DeleteEventAsync(id);

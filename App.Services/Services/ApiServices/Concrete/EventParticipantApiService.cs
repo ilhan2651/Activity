@@ -37,6 +37,63 @@ namespace App.Services.Services.ApiServices.Concrete
                 return null;
             }
         }
+        public async Task<bool> AddParticipant(JoinEventDto joinDto)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(joinDto);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync("api/EventParticipant/join", content);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Hata: {ex.Message}");
+                return false;
+            }
+
+        }
+        public async Task<AlreadyJoinedResponseDto?> GetJoinStatus(int eventId, int userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/EventParticipant/has-joined?eventId={eventId}&userId={userId}");
+
+                if (!response.IsSuccessStatusCode)
+                    return null;
+
+                var json = await response.Content.ReadAsStringAsync();
+
+                return JsonSerializer.Deserialize<AlreadyJoinedResponseDto>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Hata: {ex.Message}");
+                return null;
+            }
+        }
+        public async Task<bool> DeleteParticipant(int participantId)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/EventParticipant/delete/{participantId}");
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Silme hatası: {ex.Message}");
+                return false;
+            }
+        }
+
 
     }
+
 }
+

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,6 @@ namespace App.Dto.EventDtos
 
         public int MaxParticipants { get; set; }
         public DateTime Date { get; set; }
-        public int CreatedById { get; set; }
-   
+
     }
 }

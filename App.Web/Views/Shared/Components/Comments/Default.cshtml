@@ -1,6 +1,8 @@
 ﻿@using App.Dto.CommentDto
 @model List<ListCommentDto>
+
 <h3>Yorumlar (@ViewBag.CommentCount)</h3>
+
 @foreach (var item in Model)
 {
     <div class="comment d-flex align-items-start mb-3">
@@ -11,10 +13,14 @@
 
             @if (!string.IsNullOrEmpty(item.EventImage))
             {
-                <img src="@item.EventImage" class="img-fluid" style="max-width: 300px;" />
+                <div class="mb-2">
+                    <img src="@item.EventImage" class="img-fluid mb-1" style="max-width: 300px;" />
+                </div>
             }
-            <small class="text-muted">@item.CreatedAt.ToString("dd MMMM yyyy HH:mm")</small>
+
+            <small class="text-muted d-block mt-1">
+                @item.CreatedAt.ToString("dd MMMM yyyy HH:mm")
+            </small>
         </div>
     </div>
-
 }

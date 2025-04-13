@@ -67,7 +67,27 @@
                         <li><i class="bi bi-check-circle"></i> <span>@Model.Date.ToString("HH:mm")</span></li>
                         <li><i class="bi bi-person"></i> <span>@Model.CreatedBy tarafından oluşturuldu.</span></li>
                     </ul>
-                    <a href="#" class="btn btn-success mt-3">Etkinliğe Katıl</a>
+                    @if (ViewBag.IsJoined != null && (bool)ViewBag.IsJoined)
+                    {
+                        <a href="/Participant/DeleteParticipant?id=@ViewBag.ParticipantId" class="btn btn-danger">Katılımı Kaldır</a>
+                    }
+                    else
+                    {
+                        <a href="/Participant/AddParticipant?eventId=@Model.EventId" class="btn btn-success mt-3">Etkinliğe Katıl</a>
+                    }
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success mt-3">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Info"] != null)
+                    {
+                        <div class="alert alert-warning mt-3">@TempData["Info"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger mt-3">@TempData["Error"]</div>
+                    }
                     <br>
                     @await Component.InvokeAsync("Participants", new { eventId = Model.EventId })
                 </div>
@@ -77,13 +97,3 @@
 
 </section>
 
-<section id="portfolio" class="portfolio section">
-
-    <!-- Section Title -->
-    <div class="container section-title" data-aos="fade-up">
-        <h2>Galeri</h2>
-        <p>Etkinliklerdeki fotoğraflarımızı buradan bulabilirsiniz.</p>
-    </div><!-- End Section Title -->
-
-
-</section>

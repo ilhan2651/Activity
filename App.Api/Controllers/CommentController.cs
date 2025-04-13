@@ -23,9 +23,15 @@ namespace App.Api.Controllers
             _env = env;
             _userManager = userManager;
         }
+
+        [Authorize]
         [HttpPost("AddComment")]
         public async Task<IActionResult> AddComment([FromForm] CreateCommentDto dto)
         {
+            Console.WriteLine(">> User Identity: " + User.Identity?.Name);
+            Console.WriteLine(">> Authenticated: " + User.Identity?.IsAuthenticated);
+            Console.WriteLine(">> Claims: " + string.Join(", ", User.Claims.Select(c => $"{c.Type}: {c.Value}")));
+
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
 
@@ -38,15 +44,17 @@ namespace App.Api.Controllers
             {
                 var fileName = Guid.NewGuid() + Path.GetExtension(dto.CommentImage.FileName);
 
-                var folder = Path.Combine(Directory.GetCurrentDirectory(), "App.Web", "wwwroot", "uploads", "comments");
+                // 🔥 Doğrudan App.Web'in yolunu veriyoruz (bir üst klasöre çık ve App.Web'e gir)
+                var folder = Path.GetFullPath(Path.Combine("..", "App.Web", "wwwroot", "uploads", "comments"));
 
-                Directory.CreateDirectory(folder); // Klasör yoksa oluşturulur
+                Directory.CreateDirectory(folder); // Klasör yoksa oluştur
 
                 var filePath = Path.Combine(folder, fileName);
 
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await dto.CommentImage.CopyToAsync(stream);
 
+                // MVC'nin erişeceği şekilde URL oluşturuyoruz
                 imagePath = "/uploads/comments/" + fileName;
             }
 
@@ -62,13 +70,12 @@ namespace App.Api.Controllers
             await _commentService.AddComment(comment);
             return Ok(new { message = "Yorum başarıyla eklendi." });
         }
+
         [HttpGet("ListByEventId/{eventId}")]
         public async Task<IActionResult> GetByEvent(int eventId)
         {
             var comments = await _commentService.GetCommentsByEventId(eventId);
             return Ok(comments);
         }
-
-
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -49,7 +50,7 @@ namespace App.Services.Services.ApiServices.Concrete
                 }
 
                 var json = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<List<EventListDto>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return JsonSerializer.Deserialize<List<EventListDto?>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
             catch
             {
@@ -77,6 +78,48 @@ namespace App.Services.Services.ApiServices.Concrete
                 return null;
             }
         }
+        public async Task<bool> CreateEventAsync(CreateEventDto dto)
+        {
+            try
+            {
+                // JWT Token'ı cookie'den al
+                var token = _httpContextAccessor.HttpContext?.Request.Cookies["JWTToken"];
+                if (!string.IsNullOrEmpty(token))
+                {
+                    // Token'ı header'a ekle
+                    _httpClient.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                }
 
+                var json = JsonSerializer.Serialize(dto);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                // API'ye istek at
+                var response = await _httpClient.PostAsync("api/Event/createEvent", content);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ API HATASI: " + ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteEventAsync(int id)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/Event/delete/{id}");
+                return response.IsSuccessStatusCode;
+
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+        }
+          
+        
     }
 }

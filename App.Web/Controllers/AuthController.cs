@@ -45,8 +45,18 @@ namespace App.Web.Controllers
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
+            // ✅ TOKEN'I BURADA YAZIYORUZ
+            Response.Cookies.Append("JWTToken", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddHours(1)
+            });
+
             return RedirectToAction("Index", "MainPage");
         }
+
 
 
         [HttpGet]

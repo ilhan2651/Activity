@@ -44,12 +44,22 @@ namespace App.Services.Services.ApiServices.Concrete
         {
             try
             {
-                var json = JsonSerializer.Serialize(commentDto);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                using var request = new HttpRequestMessage(HttpMethod.Post, "api/CommentApi/AddComment");
+                using var request = new HttpRequestMessage(HttpMethod.Post, "api/Comment/AddComment");
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                request.Content = content;
+
+                var form = new MultipartFormDataContent
+        {
+            { new StringContent(commentDto.EventId.ToString()), "EventId" },
+            { new StringContent(commentDto.Content), "Content" }
+        };
+
+                if (commentDto.CommentImage != null)
+                {
+                    var stream = commentDto.CommentImage.OpenReadStream();
+                    form.Add(new StreamContent(stream), "CommentImage", commentDto.CommentImage.FileName);
+                }
+
+                request.Content = form;
 
                 var response = await _httpClient.SendAsync(request);
                 return response.IsSuccessStatusCode;
@@ -60,6 +70,7 @@ namespace App.Services.Services.ApiServices.Concrete
                 return false;
             }
         }
+
 
 
     }

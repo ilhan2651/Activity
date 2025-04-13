@@ -21,12 +21,29 @@ namespace App.Services.Services.Concrete
             _mapper = mapper;
         }
        
-        public async Task<Event> CreateEventAsync(CreateEventDto eventDto)
+        public async Task<bool> CreateEventAsync(CreateEventDto eventDto,int userId)
         {
-            var newEvent = _mapper.Map<Event>(eventDto); 
+            try
+            {
+                var newEvent = new Event
+                {
+                    EventTitle = eventDto.EventTitle,
+                    EventContent = eventDto.EventContent,
+                    EventLocation = eventDto.EventLocation,
+                    EventImageUrl = eventDto.EventImageUrl,
+                    MaxParticipants = eventDto.MaxParticipants,
+                    Date = DateTime.SpecifyKind(eventDto.Date, DateTimeKind.Utc),
+                    CreatedById = userId
+                };
+                await _eventRepository.Add(newEvent);
+                return true;
+            }
+            catch (Exception)
+            {
 
-            await _eventRepository.Add(newEvent);
-            return newEvent;
+                return false;
+            }
+            
         }
         public async Task<EventListDto> GetEventWithCreatedByAsync(int id)
         {

@@ -32,7 +32,9 @@ builder.Services.AddAuthentication("Cookies")
 builder.Services.AddScoped<EventApiService>(provider =>
 {
     var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
-    return new EventApiService(httpClientFactory.CreateClient("ApiClient"));
+    var httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
+
+    return new EventApiService(httpClientFactory.CreateClient("ApiClient"), httpContextAccessor);
 });
 
 builder.Services.AddScoped<EventParticipantApiService>(provider =>

@@ -1,0 +1,103 @@
+﻿@model App.Web.Areas.Moderator.Model.Event.CreateEventViewModel
+@using App.Web.Areas.Moderator.Model.Event
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/ModeratorLayout.cshtml";
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var entry in ViewData.ModelState)
+        {
+            foreach (var error in entry.Value.Errors)
+            {
+                <p><strong>@entry.Key:</strong> @error.ErrorMessage</p>
+            }
+        }
+    </div>
+}
+
+<style>
+    .event-card {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: auto;
+        height: 700px; /* Tüm kartlar aynı boyda */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+        .event-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .event-card input,
+        .event-card textarea,
+        .event-card select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .event-card .btn-primary {
+            width: 100%;
+            padding: 10px;
+        }
+
+    /* Açıklama için max 100 karakter */
+    .truncate-description {
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 6.8em;
+        line-height: 1.7em;
+    }
+</style>
+
+<div class="event-card mt-4">
+    <h2>Create New Event</h2>
+
+    <form method="post" enctype="multipart/form-data" action="/Moderator/ModeratorEvent/Create">
+        <label for="EventTitle">Etkinlik Başlığı</label>
+        <input name="EventTitle" type="text" class="form-control" placeholder="Enter title" />
+
+        <label for="EventContent">Etkinlik Açıklaması</label>
+        <textarea name="EventContent" class="form-control truncate-description" placeholder="Enter description"></textarea>
+
+        <label for="EventLocation">Etkinlik Yeri</label>
+        <input name="EventLocation" type="text" class="form-control" placeholder="Enter location" />
+
+        <label for="MaxParticipants">Maximum katılımcı sayısı</label>
+        <input name="MaxParticipants" type="number" class="form-control" min="1" placeholder="1" />
+
+        <label for="Date">Etkinlik Tarihi & Zamanı</label>
+        <input name="Date" type="datetime-local" class="form-control" value="@Model.Date.ToString("yyyy-MM-ddTHH:mm")" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+
+
+        <label for="EventImage">Etkinlik Resmini Yükle </label>
+        <input name="EventImage" type="file" class="form-control" accept="image/*" />
+
+        <br />
+        <button type="submit" class="btn btn-primary">Etkinliği Oluştur</button>
+    </form>
+</div>
+
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+

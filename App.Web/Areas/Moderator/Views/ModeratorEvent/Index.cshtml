@@ -1,8 +1,102 @@
-﻿
+﻿@using App.Dto.EventDtos
+@model List<EventListDto>
+
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/ModeratorLayout.cshtml";
 }
 
-<h1>Index</h1>
+<!-- SweetAlert2 CDN -->
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
 
+<style>
+    .event-image {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 15px; 
+    }
+</style>
+
+<main class="main">
+    <section id="pricing" class="pricing section">
+        <div class="container">
+            <div class="row gy-4">
+
+                <!-- Add Event Card -->
+                <div class="col-lg-4" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="pricing-item featured">
+                        <p class="popular">Etkinlik Ekle</p>
+                        <h3>Etkinlik Ekle</h3>
+                        <img src="~/UsersImg/e.jpg" class="event-image" alt="Event image" />
+                        <p class="description">
+                            Etkinlik Eklemek için bu kartı kullan.
+                        </p>
+                        <a href="/Moderator/ModeratorEvent/Create/" class="cta-btn btn btn-warning">Etkinlik Ekle</a>
+                        <ul>
+                            <li><i class="bi bi-check"></i> <span>Tarih </span></li>
+                            <li><i class="bi bi-check"></i> <span>Konum</span></li>
+                            <li><i class="bi bi-check"></i> <span>.. tarafından oluşturuldu.</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Event Cards -->
+                @foreach (var item in Model)
+                {
+                    <div class="col-lg-4" data-aos="zoom-in" data-aos-delay="100">
+                        <div class="pricing-item">
+                            <h3>@item.EventTitle</h3>
+                            <img src="@item.EventImageUrl" class="event-image" alt="Event image" />
+                            <p class="description">@item.EventContent</p>
+
+                            <a href="/Event/ReadAll/@item.EventId/" class="cta-btn btn btn-info mb-2">Göster</a>
+
+                            <ul>
+                                <li><i class="bi bi-check"></i> <span>@item.Date.ToShortDateString()</span></li>
+                                <li><i class="bi bi-check"></i> <span>@item.EventLocation</span></li>
+                                <li><i class="bi bi-check"></i> <span>@item.CreatedBy tarafından oluşturuldu.</span></li>
+                            </ul>
+
+                            <!-- Delete Button with SweetAlert -->
+                            <form method="post" action="/Moderator/ModeratorEvent/Delete/@item.EventId/" class="delete-form d-inline">
+                                <button type="submit" class="btn btn-danger show-confirm">Sil</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- SweetAlert Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const forms = document.querySelectorAll(".delete-form");
+
+        forms.forEach(function (form) {
+            form.addEventListener("submit", function (e) {
+                e.preventDefault(); // Formu durdur
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit(); // Onaylandıysa gönder
+                    }
+                });
+            });
+        });
+    });
+</script>

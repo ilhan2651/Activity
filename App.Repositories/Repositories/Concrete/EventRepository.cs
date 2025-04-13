@@ -53,14 +53,23 @@ namespace App.Repositories.Repositories.Concrete
 
         public async Task<Event?> GetWeeklyEventAsync()
         {
-            DateTime today = DateTime.UtcNow;
+            var now = DateTime.UtcNow;
 
-            DateTime startOfWeek= today.Date.AddDays(-(int)today.DayOfWeek+(int)DayOfWeek.Monday);
-            DateTime endOfWeek = startOfWeek.AddDays(6);
+            // Önce gelecekteki en yakın etkinliği bul
+            var futureEvent = await _context.Events
+                .Include(e => e.CreatedBy)
+                .Where(e => e.Date >= now)
+                .OrderBy(e => e.Date)
+                .FirstOrDefaultAsync();
+
+            if (futureEvent != null)
+                return futureEvent;
+
+            // Eğer gelecekte etkinlik yoksa, geçmişten bugüne en yakın olanı getir
             return await _context.Events
-                .Include(e=>e.CreatedBy)
-                .Where(e=>e.Date>=startOfWeek &&e.Date <= endOfWeek)
-                .OrderBy(e=>e.Date)
+                .Include(e => e.CreatedBy)
+                .Where(e => e.Date < now)
+                .OrderByDescending(e => e.Date)
                 .FirstOrDefaultAsync();
         }
         public async Task<Event?> GetLastEvent()

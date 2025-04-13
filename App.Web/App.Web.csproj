@@ -7,18 +7,30 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Moderator\Data\**" />
+    <Compile Remove="Areas\Moderator\Models\**" />
+    <Content Remove="Areas\Moderator\Data\**" />
+    <Content Remove="Areas\Moderator\Models\**" />
+    <EmbeddedResource Remove="Areas\Moderator\Data\**" />
+    <EmbeddedResource Remove="Areas\Moderator\Models\**" />
+    <None Remove="Areas\Moderator\Data\**" />
+    <None Remove="Areas\Moderator\Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\App.Dto\App.Dto.csproj" />
     <ProjectReference Include="..\App.Services\App.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+    <PackageReference Include="Refit" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Moderator\Data\" />
-    <Folder Include="Areas\Moderator\Models\" />
+    <Folder Include="wwwroot\NewFolder\" />
     <Folder Include="wwwroot\uploads\comments\" />
+    <Folder Include="wwwroot\uploads\events\" />
   </ItemGroup>
 
 </Project>

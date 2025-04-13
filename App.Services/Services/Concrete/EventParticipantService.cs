@@ -26,13 +26,22 @@ namespace App.Services.Services.Concrete
         public async Task JoinEventAsync(JoinEventDto dto)
         {
             var alreadyJoined = await _eventParticipantRepository.AlreadyJoined(dto.EventId, dto.UserId);
-            if (alreadyJoined)
+            if (alreadyJoined!=null)
             {
                 throw new InvalidOperationException("Bu etkinliğe zaten katıldınız.");
             }
             var eventParticipant = _mapper.Map<EventParticipant>(dto);
             eventParticipant.JoinedAt = DateTime.UtcNow;
             await _eventParticipantRepository.Add(eventParticipant);
+        }
+        public async Task<bool> AlreadyJoined(int eventId, int userId)
+        {
+            var alreadyJoined = await _eventParticipantRepository.AlreadyJoined(eventId, userId);
+            if (alreadyJoined==null)
+            {
+                return false;
+            }
+            return true;
         }
         public async Task<bool> DeleteAsync(int id)
         {

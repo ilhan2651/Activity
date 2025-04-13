@@ -1,5 +1,6 @@
 ﻿using App.Dto.EventDtos;
 using App.Entities;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace App.Services.Services.Abstract
     public interface IEventService 
     {
 
-        Task<Event> CreateEventAsync(CreateEventDto eventDto);
+        Task<bool> CreateEventAsync(CreateEventDto eventDto,int UserId);
         Task<Event> UpdateEventAsync(int id, UpdateEventDto eventDto);
          Task<bool> DeleteEventAsync(int id);
         Task<List<EventListDto>> GetAllEventsWithCreated();

@@ -19,10 +19,10 @@ namespace App.Repositories.Repositories.Concrete
             _context=context;
         }
 
-        public async Task<bool> AlreadyJoined(int eventId, int userId)
+        public async Task<EventParticipant> AlreadyJoined(int eventId, int userId)
         {
-          return  await _context.EventParticipants
-                .AnyAsync(p=>p.UserId == userId && p.EventId==eventId);
+          return await _context.EventParticipants
+        .FirstOrDefaultAsync(p => p.EventId == eventId && p.UserId == userId);
         }
 
         public async Task<List<EventParticipant>> GetParticipantsByEventId(int eventId)
@@ -32,6 +32,7 @@ namespace App.Repositories.Repositories.Concrete
                .Include(p => p.User)
                .ToListAsync();
         }
+        
                
     }
 }

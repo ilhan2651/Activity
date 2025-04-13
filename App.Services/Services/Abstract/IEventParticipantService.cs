@@ -13,6 +13,7 @@ namespace App.Services.Services.Abstract
         Task JoinEventAsync(JoinEventDto dto);
         Task<List<ParticipantListDto>> GetParticipantListAsync(int eventId);
         Task<bool> DeleteAsync(int id);
+        Task<bool> AlreadyJoined(int eventId, int userId);
 
 
     }

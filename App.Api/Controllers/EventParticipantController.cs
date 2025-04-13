@@ -1,8 +1,11 @@
 ﻿using App.Dto.EventParticipantDtos;
+using App.Repositories.Context;
 using App.Services.Services.Abstract;
 using App.Services.Services.Concrete;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace App.Api.Controllers
 {
@@ -10,15 +13,18 @@ namespace App.Api.Controllers
     [ApiController]
     public class EventParticipantController : ControllerBase
     {
+        private readonly ActivityProjectContext _context;
         private readonly IEventParticipantService _eventParticipantService;
-        public EventParticipantController(IEventParticipantService eventParticipantService)
+        public EventParticipantController(IEventParticipantService eventParticipantService,ActivityProjectContext context)
         {
             _eventParticipantService = eventParticipantService;
+            _context = context; 
         }
 
         [HttpPost("join")]
         public async Task<IActionResult> JoinEvent([FromBody] JoinEventDto dto)
         {
+
             try
             {
                 await _eventParticipantService.JoinEventAsync(dto);
@@ -29,7 +35,7 @@ namespace App.Api.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteParticipant(int id)
         {    
               var deletedValue = await _eventParticipantService.DeleteAsync(id);
@@ -51,6 +57,21 @@ namespace App.Api.Controllers
             }
             return Ok(participants);
         }
+        [HttpGet("has-joined")]
+        public async Task<IActionResult> HasJoined(int eventId, int userId)
+        {
+            var participant = await _context.EventParticipants
+                .FirstOrDefaultAsync(p => p.EventId == eventId && p.UserId == userId);
+
+            var result = new AlreadyJoinedResponseDto
+            {
+                Joined = participant != null,
+                ParticipantId = participant?.Id
+            };
+
+            return Ok(result); 
+        }
+
 
     }
 }

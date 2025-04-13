@@ -1,4 +1,5 @@
 ﻿using App.Dto.CommentDto;
+using App.Services.Services.ApiServices.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
@@ -8,39 +9,41 @@ namespace App.Web.Controllers
     [Authorize]
     public class CommentController : Controller
     {
+        private readonly CommentApiService _commentApiService;
         private readonly HttpClient _httpClient;
 
-        public CommentController(HttpClient httpClient)
+        public CommentController(HttpClient httpClient, CommentApiService commentApiService)
         {
             _httpClient = httpClient;
+            _commentApiService = commentApiService;
         }
+
 
         [HttpPost]
         public async Task<IActionResult> AddComment(CreateCommentDtoMvc dto)
         {
-            var token = Request.Cookies["jwt"];
-            if (!string.IsNullOrEmpty(token))
+            var token = Request.Cookies["JWTToken"];
+            if (string.IsNullOrEmpty(token))
             {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                TempData["Error"] = "Token bulunamadı. Lütfen tekrar giriş yapın.";
+                return RedirectToAction("ReadAll", "Event", new { id = dto.EventId });
             }
 
-            var form = new MultipartFormDataContent();
-            form.Add(new StringContent(dto.EventId.ToString()), "EventId");
-            form.Add(new StringContent(dto.Content), "Content");
-
-            // Dosya varsa, yükleme işlemi
-            if (dto.CommentImage != null)
+            // DTO Dönüşümü
+            var apiDto = new CreateCommentDto
             {
-                var stream = dto.CommentImage.OpenReadStream();
-                form.Add(new StreamContent(stream), "CommentImage", dto.CommentImage.FileName);
-            }
+                EventId = dto.EventId,
+                Content = dto.Content,
+                CommentImage = dto.CommentImage
+            };
 
-            var response = await _httpClient.PostAsync("https://localhost:44344/api/Comment/AddComment", form);
+            // Yorum gönderimi
+            bool success = await _commentApiService.PostComment(apiDto, token);
 
-            if (!response.IsSuccessStatusCode)
+            if (!success)
             {
                 TempData["Error"] = "Yorum gönderilemedi.";
-                return RedirectToAction("ReadAll", "Event", new { id = dto.EventId }); // Hata durumunda geri dönüyoruz
+                return RedirectToAction("ReadAll", "Event", new { id = dto.EventId });
             }
 
             TempData["Success"] = "Yorum başarıyla eklendi.";
@@ -48,4 +51,6 @@ namespace App.Web.Controllers
         }
 
     }
+
 }
+
