@@ -5,7 +5,7 @@ public class CreateCommentViewComponent : ViewComponent
 {
     public Task<IViewComponentResult> InvokeAsync(int eventId)
     {
-        var dto = new CreateCommentDto { EventId = eventId }; // EventId'yi buraya gönderiyoruz
+        var dto = new CreateCommentDto { EventId = eventId }; 
         return Task.FromResult<IViewComponentResult>(View(dto));
     }
 }

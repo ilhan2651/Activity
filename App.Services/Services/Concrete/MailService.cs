@@ -33,4 +33,41 @@ public class MailService : IMailService
         await smtp.SendAsync(mail);
         await smtp.DisconnectAsync(true);
     }
+
+
+
+
+
+
+    public async Task SendBulkEventCreatedMailAsync(List<string> emails,string eventTitle,string eventContent,string eventDate, string eventTime, string eventLocation)
+    {
+        var mail = new MimeMessage();
+        mail.From.Add(new MailboxAddress(_config["MailSettings:DisplayName"], _config["MailSettings:From"]));
+
+        foreach (var email in emails)
+        {
+            if (!string.IsNullOrWhiteSpace(email))
+                mail.Bcc.Add(MailboxAddress.Parse(email));
+        }
+
+        mail.Subject = $"Yeni Etkinlik Oluşturuldu: {eventTitle}";
+
+        mail.Body = new TextPart("plain")
+        {
+            Text = $"Merhaba,\n\n" +
+           $"Yeni bir etkinlik yayınlandı!\n\n" +
+           $"Etkinlik Başlığı : {eventTitle}\n" +
+           $"Etkinlik İçeriği : {eventContent}\n" +
+           $"Etkinlik Tarihi  : {eventDate}\n" +
+           $"Etkinlik Saati   : {eventTime}\n" +
+           $"Etkinlik Yeri    : {eventLocation}\n\n" +
+           $"Katılmak için hemen platformu ziyaret edin!"
+        };
+
+        using var smtp = new SmtpClient();
+        await smtp.ConnectAsync(_config["MailSettings:Host"], int.Parse(_config["MailSettings:Port"]), false);
+        await smtp.AuthenticateAsync(_config["MailSettings:From"], _config["MailSettings:Password"]);
+        await smtp.SendAsync(mail);
+        await smtp.DisconnectAsync(true);
+    }
 }

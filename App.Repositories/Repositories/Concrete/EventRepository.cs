@@ -55,7 +55,6 @@ namespace App.Repositories.Repositories.Concrete
         {
             var now = DateTime.UtcNow;
 
-            // Önce gelecekteki en yakın etkinliği bul
             var futureEvent = await _context.Events
                 .Include(e => e.CreatedBy)
                 .Where(e => e.Date >= now)
@@ -65,7 +64,6 @@ namespace App.Repositories.Repositories.Concrete
             if (futureEvent != null)
                 return futureEvent;
 
-            // Eğer gelecekte etkinlik yoksa, geçmişten bugüne en yakın olanı getir
             return await _context.Events
                 .Include(e => e.CreatedBy)
                 .Where(e => e.Date < now)

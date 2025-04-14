@@ -32,13 +32,23 @@ namespace App.Services.Services.Concrete
             comment.CreatedAt= DateTime.UtcNow;
             await _commentRepository.Add(comment);
         }
-        public async Task<bool> DeleteEventAsync(int id)
+        public async Task<bool> DeleteCommentAsync(int id)
         {
-            var existingEvent = await _commentRepository.GetById(id);
-            if (existingEvent == null) return false;
+            var existingComment = await _commentRepository.GetById(id);
+            if (existingComment == null) return false;
 
             await _commentRepository.Delete(id);
             return true;
+        }
+        public async Task<List<ListCommentDtoModerator>> GetAllComments()
+        {
+            var comments= await _commentRepository.GetAllComments();
+            if (comments==null)
+            {
+                return new List<ListCommentDtoModerator> { };
+            }
+            return  _mapper.Map<List<ListCommentDtoModerator>>(comments);
+            
         }
     }
 }

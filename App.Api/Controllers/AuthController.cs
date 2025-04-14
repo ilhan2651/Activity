@@ -43,7 +43,7 @@ namespace App.Api.Controllers
                 Expires = DateTime.UtcNow.AddHours(1)
             };
 
-            Response.Cookies.Append("jwt", token, cookieOptions); 
+            Response.Cookies.Append("JWTToken", token, cookieOptions); 
 
             return Ok(new
             {
@@ -63,10 +63,8 @@ namespace App.Api.Controllers
         public IActionResult Logout()
         {
 
-            // JWT Token çerezini sil
             Response.Cookies.Delete("JWTToken");
             Response.Cookies.Delete(".AspNetCore.Identity.Application");
-            // Kullanıcının kimlik bilgisini sıfırla
             HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity());
 
             return Ok(new { message = "Çıkış yapıldı" });
@@ -89,7 +87,7 @@ namespace App.Api.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser([FromBody]RegisterDto registerDto)
         {
-            var result= await _authService.Register(registerDto);
+            var result = await _authService.Register(registerDto);
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
@@ -99,6 +97,3 @@ namespace App.Api.Controllers
      
     }
 }
-// git add .
-//git commit -m "Açıklayıcı bir mesaj"
-//git push origin main

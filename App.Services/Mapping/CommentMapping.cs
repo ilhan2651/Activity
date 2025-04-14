@@ -17,6 +17,11 @@ namespace App.Services.Mapping
                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserFullName))
                .ForMember(dest => dest.UserImage, opt => opt.MapFrom(src => src.User.UserProfilePictureUrl));
             CreateMap<CreateCommentDto, Comment>();
+
+            CreateMap<Comment, ListCommentDtoModerator>()
+           .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserFullName))
+           .ForMember(dest => dest.EventName, opt => opt.MapFrom(src => src.Event.EventTitle));
+
         }
     }
 }

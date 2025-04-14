@@ -1,0 +1,24 @@
+﻿@using App.Dto.Role
+@model List<AppUserDto>
+@{
+    ViewData["Title"] = "UserRoleList";
+    Layout = "~/Views/Shared/ModeratorLayout.cshtml";
+}
+<h1>Kullanıcı Rol Listesi</h1>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Kullanıcı</th>
+        <th>Rol Ata</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.UserName</td>
+            <td> <a href="/Moderator/ModeratorRole/AssignRole/@item.Id/" class="btn btn-outline-warning">Rol Ata</a></td>
+        </tr>
+    }
+</table>
+<a href="/Moderator/ModeratorRole/Index/" class="btn btn-primary">Rol Listesine Dön</a>
+
+

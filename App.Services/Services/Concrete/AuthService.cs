@@ -70,6 +70,7 @@ namespace App.Services.Services.Concrete
         }
         public async Task<IdentityResult> Register(RegisterDto registerDto)
         {
+
             var user = new AppUser
             {
                 UserFullName = registerDto.UserFullName,
@@ -80,6 +81,10 @@ namespace App.Services.Services.Concrete
                 PhoneNumber = registerDto.PhoneNumber
             };
             var result=await _userManager.CreateAsync(user,registerDto.Password);
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, "Member");
+            }
             return result;
         }
     }

@@ -11,5 +11,7 @@ namespace App.Repositories.Repositories.Abstract
     public interface ICommentRepository : IGenericRepository<Comment>
     {
           Task<List<Comment>> GetCommentsWithWritersByEventId(int eventId);
+        Task<List<Comment>> GetAllComments();
+
     }
 }

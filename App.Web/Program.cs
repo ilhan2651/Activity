@@ -2,6 +2,8 @@ using App.Services.Services.ApiServices.Concrete;
 using App.Services.Validation;
 using FluentValidation.AspNetCore;
 using FluentValidation;
+using App.Web.MiddleWares;
+using App.Services.Services.Abstract;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +25,7 @@ builder.Services.AddAuthentication("Cookies")
     .AddCookie("Cookies", options =>
     {
         options.LoginPath = "/Auth/Login";
-        options.AccessDeniedPath = "/Auth/AccessDenied";
+        options.AccessDeniedPath = "/Home/Unauthorized";
         options.Cookie.Name = "MyApp.Auth";
         options.Cookie.HttpOnly = true;
     });
@@ -66,6 +68,15 @@ builder.Services.AddScoped<ContactApiService>(provider =>
 
     return new ContactApiService(httpClientFactory.CreateClient("ApiClient"), httpContextAccessor);
 });
+builder.Services.AddScoped<RoleApiService>(provider =>
+{
+    var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+    var httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
+
+    return new RoleApiService(httpClientFactory.CreateClient("ApiClient"));
+});
+builder.Services.AddScoped<IMailService, MailService>();
+
 
 
 var app = builder.Build();
@@ -83,6 +94,8 @@ app.UseStaticFiles();
 
 
 app.UseRouting();
+app.UseMiddleware<JwtCookieMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

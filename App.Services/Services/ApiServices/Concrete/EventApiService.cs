@@ -82,11 +82,9 @@ namespace App.Services.Services.ApiServices.Concrete
         {
             try
             {
-                // JWT Token'ı cookie'den al
                 var token = _httpContextAccessor.HttpContext?.Request.Cookies["JWTToken"];
                 if (!string.IsNullOrEmpty(token))
                 {
-                    // Token'ı header'a ekle
                     _httpClient.DefaultRequestHeaders.Authorization =
                         new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
                 }
@@ -94,7 +92,6 @@ namespace App.Services.Services.ApiServices.Concrete
                 var json = JsonSerializer.Serialize(dto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                // API'ye istek at
                 var response = await _httpClient.PostAsync("api/Event/createEvent", content);
                 return response.IsSuccessStatusCode;
             }

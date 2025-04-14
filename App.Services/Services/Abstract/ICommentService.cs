@@ -11,7 +11,9 @@ namespace App.Services.Services.Abstract
     public interface ICommentService 
     {
         Task AddComment(Comment comment);
-        Task<bool> DeleteEventAsync(int id);
+        Task<bool> DeleteCommentAsync(int id);
         Task<List<ListCommentDto>> GetCommentsByEventId(int eventId);
+        Task<List<ListCommentDtoModerator>> GetAllComments();
+
     }
 }

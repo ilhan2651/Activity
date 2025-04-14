@@ -24,14 +24,11 @@ namespace App.Api.Controllers
             _userManager = userManager;
         }
 
-        [Authorize]
+        [Authorize(Roles = "Member,Admin,Moderator")]
         [HttpPost("AddComment")]
         public async Task<IActionResult> AddComment([FromForm] CreateCommentDto dto)
         {
-            Console.WriteLine(">> User Identity: " + User.Identity?.Name);
-            Console.WriteLine(">> Authenticated: " + User.Identity?.IsAuthenticated);
-            Console.WriteLine(">> Claims: " + string.Join(", ", User.Claims.Select(c => $"{c.Type}: {c.Value}")));
-
+           
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
 
@@ -44,17 +41,15 @@ namespace App.Api.Controllers
             {
                 var fileName = Guid.NewGuid() + Path.GetExtension(dto.CommentImage.FileName);
 
-                // 🔥 Doğrudan App.Web'in yolunu veriyoruz (bir üst klasöre çık ve App.Web'e gir)
                 var folder = Path.GetFullPath(Path.Combine("..", "App.Web", "wwwroot", "uploads", "comments"));
 
-                Directory.CreateDirectory(folder); // Klasör yoksa oluştur
+                Directory.CreateDirectory(folder); 
 
                 var filePath = Path.Combine(folder, fileName);
 
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await dto.CommentImage.CopyToAsync(stream);
 
-                // MVC'nin erişeceği şekilde URL oluşturuyoruz
                 imagePath = "/uploads/comments/" + fileName;
             }
 
@@ -76,6 +71,24 @@ namespace App.Api.Controllers
         {
             var comments = await _commentService.GetCommentsByEventId(eventId);
             return Ok(comments);
+        }
+        [Authorize(Roles ="Admin,Moderator")]
+        [HttpGet("ListAll")]
+        public async Task<IActionResult> GetAll()
+        {
+            var comments = await _commentService.GetAllComments();
+            return Ok(comments);
+        }
+        [Authorize(Roles ="Admin,Moderator")]
+        [HttpDelete("Delete/{id}")]
+        public async Task<IActionResult> DeleteComment(int id)
+        {
+            var comment= await _commentService.DeleteCommentAsync(id);
+            if (comment==null)
+            {
+                return BadRequest();
+            }
+            return Ok();
         }
     }
 }

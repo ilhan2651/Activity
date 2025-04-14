@@ -54,7 +54,7 @@ namespace App.Services.Services.ApiServices.Concrete
                 {
                     var json = await response.Content.ReadAsStringAsync();
                     var obj = JsonSerializer.Deserialize<JsonObject>(json);
-                    return obj?["message"]?.ToString(); // "İletişim başarıyla eklendi."
+                    return obj?["message"]?.ToString();
                 }
                 return null;
             }

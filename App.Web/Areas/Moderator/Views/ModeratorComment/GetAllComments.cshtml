@@ -1,0 +1,65 @@
+﻿@model List<App.Dto.CommentDto.ListCommentDtoModerator>
+@{
+    ViewData["Title"] = "GetAllComments";
+    Layout = "~/Views/Shared/ModeratorLayout.cshtml";
+}
+
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success text-center" role="alert">
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger text-center" role="alert">
+        @TempData["Error"]
+    </div>
+}
+
+<h2 class="text-center mt-4">Yorum Listesi</h2>
+
+<table class="table table-bordered table-striped text-center align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Yorum İçeriği</th>
+            <th>Oluşturulma Tarihi</th>
+            <th>Kullanıcı Adı</th>
+            <th>Etkinlik Adı</th>
+            <th>Kullanıcı Resmi</th>
+            <th>Etkinlik Resmi</th>
+            <th>İşlem</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var comment in Model)
+        {
+            <tr>
+                <td>@comment.Content</td>
+                <td>@comment.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                <td>@comment.UserName</td>
+                <td>@comment.EventName</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(comment.EventImage))
+                    {
+                        <img src="@comment.EventImage" alt="Etkinlik Resmi" width="40" height="40" style="object-fit: cover; border-radius: 8px;" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">Yok</span>
+                    }
+                </td>
+                <td>
+                    <form action="/Moderator/ModeratorComment/DeleteComment" method="post" onsubmit="return confirm('Silmek istediğinize emin misiniz?');">
+                        <input type="hidden" name="id" value="@comment.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                    </form>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+

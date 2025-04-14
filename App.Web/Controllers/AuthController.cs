@@ -2,7 +2,10 @@
 using App.Services.Services.ApiServices.Concrete;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace App.Web.Controllers
@@ -10,10 +13,12 @@ namespace App.Web.Controllers
     public class AuthController : Controller
     {
         private readonly AuthApiService _authApiService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public AuthController(AuthApiService authApiService)
+        public AuthController(AuthApiService authApiService, IWebHostEnvironment webHostEnvironment)
         {
             _authApiService = authApiService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet]
@@ -33,6 +38,9 @@ namespace App.Web.Controllers
                 return View(loginDto);
             }
 
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
             var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, id),
@@ -40,12 +48,13 @@ namespace App.Web.Controllers
         new Claim(ClaimTypes.Email, email)
     };
 
+            claims.AddRange(jwtToken.Claims.Where(c => c.Type == ClaimTypes.Role));
+
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            // ✅ TOKEN'I BURADA YAZIYORUZ
             Response.Cookies.Append("JWTToken", token, new CookieOptions
             {
                 HttpOnly = true,
@@ -59,21 +68,50 @@ namespace App.Web.Controllers
 
 
 
+
         [HttpGet]
         public IActionResult Register() => View();
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterDto dto)
+        public async Task<IActionResult> Register(RegisterDtoMvc dto)
         {
             if (!ModelState.IsValid) return View(dto);
 
-            var isSuccess = await _authApiService.RegisterAsync(dto);
+            string? imagePath = null;
+
+            if (dto.ImagePath != null && dto.ImagePath.Length > 0)
+            {
+                var fileName = Guid.NewGuid() + Path.GetExtension(dto.ImagePath.FileName);
+                var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "userImages");
+
+                Directory.CreateDirectory(folderPath);
+                var fullPath = Path.Combine(folderPath, fileName);
+
+                using var stream = new FileStream(fullPath, FileMode.Create);
+                await dto.ImagePath.CopyToAsync(stream);
+
+                imagePath = "/uploads/userImages/" + fileName;
+            }
+            var registerDto = new RegisterDto
+            {
+                UserFullName = dto.UserFullName,
+                UserName = dto.UserName,
+                Email = dto.Email,
+                Password = dto.Password,
+                ConfirmPassword = dto.ConfirmPassword,
+                PhoneNumber = dto.PhoneNumber,
+                UserProfilePictureUrl = imagePath
+            };
+
+
+
+            var isSuccess = await _authApiService.RegisterAsync(registerDto);
             if (isSuccess) return RedirectToAction("Login");
 
             ModelState.AddModelError("", "Kayıt başarısız. Tekrar deneyin.");
             return View(dto);
         }
-
+        [Authorize(Roles ="Admin,Member,Moderator")]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

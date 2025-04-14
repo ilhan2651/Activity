@@ -12,7 +12,7 @@ namespace App.Dto.CommentDto
     {
         public int EventId { get; set; }
         public string Content { get; set; } = null!;
-        public IFormFile? CommentImage { get; set; } // sadece formdan gelen dosya
+        public IFormFile? CommentImage { get; set; } 
     }
 }
 

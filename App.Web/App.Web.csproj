@@ -31,6 +31,7 @@
     <Folder Include="wwwroot\NewFolder\" />
     <Folder Include="wwwroot\uploads\comments\" />
     <Folder Include="wwwroot\uploads\events\" />
+    <Folder Include="wwwroot\uploads\userImages\" />
   </ItemGroup>
 
 </Project>

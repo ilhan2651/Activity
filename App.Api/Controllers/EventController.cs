@@ -1,6 +1,7 @@
 ﻿using App.Dto.EventDtos;
 using App.Entities;
 using App.Services.Services.Abstract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
@@ -30,6 +31,7 @@ namespace App.Api.Controllers
             if (evnt == null) return NotFound(new { message = "Etkinlik bulunamadı." });
             return Ok(evnt);
         }
+        [Authorize(Roles ="Admin,Moderator")]
         [HttpPost("createEvent")]
         public async Task<IActionResult> CreateEvent([FromBody] CreateEventDto eventDto)
         {
@@ -47,7 +49,7 @@ namespace App.Api.Controllers
 
             return Ok(new { message = "Etkinlik başarıyla oluşturuldu." });
         }
-
+        [Authorize(Roles = "Admin,Moderator")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEvent(int id,  [FromBody] UpdateEventDto eventDto)
         {
@@ -62,6 +64,7 @@ namespace App.Api.Controllers
             }
             return Ok(updatedEvent);
         }
+        [Authorize(Roles = "Admin,Moderator")]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {

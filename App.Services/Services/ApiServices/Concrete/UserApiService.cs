@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -36,6 +37,16 @@ namespace App.Services.Services.ApiServices.Concrete
 
                 return null;
             }
+
+        }
+        public async Task<List<string>> GetAllEmailsAsync()
+        {
+            var response = await _httpClient.GetAsync("https://localhost:7006/api/user/GetAllEmails");
+
+            if (!response.IsSuccessStatusCode)
+                return new List<string>();
+
+            return await response.Content.ReadFromJsonAsync<List<string>>();
         }
     }
 }

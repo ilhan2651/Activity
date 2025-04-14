@@ -14,16 +14,26 @@ namespace App.Repositories.Repositories.Concrete
     public class CommentRepository : GenericRepository<Comment>, ICommentRepository
     {
         private readonly ActivityProjectContext _context;
-        public CommentRepository(ActivityProjectContext context):base(context)
+        public CommentRepository(ActivityProjectContext context) : base(context)
         {
             _context = context;
         }
         public async Task<List<Comment>> GetCommentsWithWritersByEventId(int eventId)
         {
-           return await _context.Comments
+            return await _context.Comments
+                 .Include(c => c.User)
+                 .Where(c => c.EventId == eventId)
+                 .ToListAsync();
+        }
+        public async Task<List<Comment>> GetAllComments()
+        {
+            return await _context.Comments
                 .Include(c => c.User)
-                .Where(c => c.EventId == eventId)
+                .Include(c => c.Event)
+                .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();
         }
+       
+           
     }
 }

@@ -72,7 +72,6 @@ namespace App.Services.Services.ApiServices.Concrete
             var token = jsonObj.GetProperty("token").GetString();
             var user = jsonObj.GetProperty("user");
 
-            // 🔧 int tipinde gelen ID'yi int olarak alıp string'e çeviriyoruz
             var id = user.GetProperty("id").GetInt32().ToString();
             var username = user.GetProperty("username").GetString();
             var email = user.GetProperty("email").GetString();

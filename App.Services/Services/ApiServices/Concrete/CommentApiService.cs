@@ -40,6 +40,27 @@ namespace App.Services.Services.ApiServices.Concrete
                 return null;
             }
         }
+        public async Task<List<ListCommentDtoModerator>> GetAllComents(string token)
+        {
+            try
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Get, "api/Comment/ListAll");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.SendAsync(request);
+
+                if (!response.IsSuccessStatusCode)
+                    return new List<ListCommentDtoModerator>();
+
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<List<ListCommentDtoModerator>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public async Task<bool> PostComment(CreateCommentDto commentDto, string token)
         {
             try
@@ -70,7 +91,22 @@ namespace App.Services.Services.ApiServices.Concrete
                 return false;
             }
         }
+        public async Task<bool> DeleteComment(int id, string token)
+        {
+            try
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Delete, $"api/Comment/Delete/{id}");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+                var response = await _httpClient.SendAsync(request);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Yorum silme hatası: {ex.Message}");
+                return false;
+            }
+        }
 
 
     }

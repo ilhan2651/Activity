@@ -1,5 +1,7 @@
 ﻿
 
+using Microsoft.AspNetCore.Http;
+
 namespace App.Dto.UserDtos
 {
     public class RegisterDto

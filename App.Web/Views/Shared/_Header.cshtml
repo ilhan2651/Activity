@@ -1,14 +1,29 @@
 ﻿<header id="header" class="header d-flex align-items-center sticky-top">
     <div class="container position-relative d-flex align-items-center">
 
-        <a href="index.html" class="logo d-flex align-items-center me-auto">
-            <!-- Uncomment the line below if you also wish to use an image logo -->
-            <!-- <img src="assets/img/logo.png" alt=""> -->
+        <a href="/MainPage/Index/" class="logo d-flex align-items-center me-auto">
             <h1 class="sitename">AtaApt</h1><span>.</span>
         </a>
 
-        <nav id="navmenu" class="navmenu">
-            <ul>
+        <nav id="navmenu" class="navmenu d-flex align-items-center">
+
+            <div class="d-flex me-4 align-items-center">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <span class="text-dark fw-bold me-2" style="font-size: 0.9rem;">Welcome My Friend</span>
+
+                    <form asp-action="Logout" asp-controller="Auth" method="post" class="mb-0">
+                        <button type="submit" class="btn btn-outline-danger px-2 py-1 btn-sm" style="font-size: 0.8rem;">Çıkış</button>
+                    </form>
+                }
+                else
+                {
+                    <a href="/Auth/Login" class="btn btn-outline-primary px-2 py-1 btn-sm me-2" style="font-size: 0.8rem;">Giriş</a>
+                    <a href="/Auth/Register" class="btn btn-primary px-2 py-1 btn-sm" style="font-size: 0.8rem;">Kayıt</a>
+                }
+            </div>
+
+            <ul class="mb-0">
                 <li><a href="/MainPage/Index/" class="active">Anasayfa</a></li>
                 <li class="dropdown">
                     <a href="/About/Index/"><span>Hakkımızda</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
@@ -20,14 +35,15 @@
                 <li><a href="/Event/Index/">Etkinlikler</a></li>
                 <li><a href="/Contact/Index/">İletişim</a></li>
             </ul>
+
             <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
 
         <div class="header-social-links">
-            <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-            <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-            <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+            <a href="https://x.com/ilhan2651" class="twitter"><i class="bi bi-twitter-x"></i></a>
+            <a href="https://www.facebook.com/?locale=tr_TR" class="facebook"><i class="bi bi-facebook"></i></a>
+            <a href="https://www.instagram.com/ilhan.randaa/" class="instagram"><i class="bi bi-instagram"></i></a>
+            <a href="https://www.linkedin.com/in/ilhan-randa-951936224/" class="linkedin"><i class="bi bi-linkedin"></i></a>
         </div>
 
     </div>
