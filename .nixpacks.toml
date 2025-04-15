@@ -1,8 +1,11 @@
 [phases.setup]
 nixPkgs = ["dotnet-sdk_8"]
 
+[phases.install]
+cmds = []
+
 [phases.build]
 cmds = ["dotnet publish App.Api/App.Api.csproj -c Release -o out"]
 
-[phases.start]
+[start]
 cmd = "dotnet out/App.Api.dll"
