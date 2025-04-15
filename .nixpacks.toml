@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["dotnet-sdk_8"]
+
+[phases.build]
+cmds = ["dotnet publish -c Release -o out"]
+
+[phases.start]
+cmd = "dotnet out/App.Api.dll"
+
+[variables]
+ROOT = "App.Api"
