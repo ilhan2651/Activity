@@ -111,14 +111,32 @@ namespace App.Web.Controllers
             ModelState.AddModelError("", "Kayıt başarısız. Tekrar deneyin.");
             return View(dto);
         }
-        [Authorize(Roles ="Admin,Member,Moderator")]
+        [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            await _authApiService.LogoutAsync(); 
+            await HttpContext.SignOutAsync("Cookies");
 
-            return RedirectToAction("Login");
+            Response.Cookies.Delete("JWTToken", new CookieOptions
+            {
+                Path = "/",
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                HttpOnly = true
+            });
+
+            Response.Cookies.Delete("jwt", new CookieOptions
+            {
+                Path = "/",
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                HttpOnly = true
+            });
+
+            return RedirectToAction("Login", "Auth");
         }
+
+
 
     }
 }

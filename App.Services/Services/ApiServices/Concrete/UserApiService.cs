@@ -41,7 +41,7 @@ namespace App.Services.Services.ApiServices.Concrete
         }
         public async Task<List<string>> GetAllEmailsAsync()
         {
-            var response = await _httpClient.GetAsync("https://localhost:7006/api/user/GetAllEmails");
+            var response = await _httpClient.GetAsync("api/user/getAllEmails");
 
             if (!response.IsSuccessStatusCode)
                 return new List<string>();

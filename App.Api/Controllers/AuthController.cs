@@ -43,7 +43,6 @@ namespace App.Api.Controllers
                 Expires = DateTime.UtcNow.AddHours(1)
             };
 
-            Response.Cookies.Append("JWTToken", token, cookieOptions); 
 
             return Ok(new
             {

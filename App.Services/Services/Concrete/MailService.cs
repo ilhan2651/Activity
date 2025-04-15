@@ -2,6 +2,7 @@
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
+using static System.Net.WebRequestMethods;
 
 public class MailService : IMailService
 {
@@ -18,7 +19,6 @@ public class MailService : IMailService
 
         mail.To.Add(new MailboxAddress("İlhan Randa", "ilhanrandakk@gmail.com"));
         mail.To.Add(new MailboxAddress("Barış Şükrü Yücedağ", "bar.sukru.fb@hotmail.com"));
-        mail.To.Add(new MailboxAddress("Dİlara Faflıoğullları", "dilara.fahli@outlook.com"));
 
         mail.Subject = $"Yeni İletişim Mesajı: {subject}";
 
@@ -61,7 +61,9 @@ public class MailService : IMailService
            $"Etkinlik Tarihi  : {eventDate}\n" +
            $"Etkinlik Saati   : {eventTime}\n" +
            $"Etkinlik Yeri    : {eventLocation}\n\n" +
-           $"Katılmak için hemen platformu ziyaret edin!"
+           $"Katılmak için hemen platformu ziyaret edin!\n\n" +
+           "https://localhost:7006/MainPage"
+
         };
 
         using var smtp = new SmtpClient();
